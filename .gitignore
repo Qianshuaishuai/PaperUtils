@@ -1,0 +1,10 @@
+.DS_Store
+.history
+.idea
+.log
+*.tmp
+/河南试卷/
+/湖北/
+/内蒙古/
+/知识点文件/
+/res/
