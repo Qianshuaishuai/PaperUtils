@@ -108,8 +108,11 @@ func init() {
 	// getPaperQuestion(db)
 	// getPaperQuestion(db)
 	// writeSql()
-	GetZsPrimarySchoolPaper()
+	// GetZsPrimarySchoolPaper()
 	// writeKnowledge()
+
+	writeOMaterial()
+	// writeOKeypoint()
 }
 
 //获取config

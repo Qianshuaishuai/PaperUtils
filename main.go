@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "DbHelpDreamEbagEfficientReading/models"
-	_ "DbHelpDreamEbagEfficientReading/routers"
+	_ "PaperUtils/models"
+	_ "PaperUtils/routers"
 
 	"github.com/astaxie/beego"
 )

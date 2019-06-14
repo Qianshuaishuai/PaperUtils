@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"DbHelpDreamEbagEfficientReading/controllers"
+	"PaperUtils/controllers"
 
 	"github.com/astaxie/beego"
 )
