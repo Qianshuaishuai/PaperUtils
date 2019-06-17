@@ -42,6 +42,12 @@ type Section struct {
 	Score        float64 `json:"score"`
 }
 
+type OriginalStruct struct {
+	ContentHTML  string `json:"contentHtml"`
+	AnswerHTML   string `json:"answerHtml"`
+	AnalysisHTML string `json:"analysisHtml"`
+}
+
 type Difficulty struct {
 	Code  string `json:"code"`
 	Name  string `json:"name"`
@@ -54,11 +60,12 @@ type Knowledgeaaa struct {
 }
 
 type SubQuestion struct {
-	Stem    string   `json:"stem"`
-	Code    string   `json:"code"`
-	Options []Option `json:"options"`
-	Answers []Answer `json:"answers"`
-	Score   float64  `json:"score"`
+	Stem           string         `json:"stem"`
+	Code           string         `json:"code"`
+	Options        []Option       `json:"options"`
+	Answers        []Answer       `json:"answers"`
+	Score          float64        `json:"score"`
+	OriginalStruct OriginalStruct `json:"originalStruct"`
 }
 
 type Answer struct {
@@ -66,6 +73,7 @@ type Answer struct {
 }
 
 type Paper struct {
+	ID            string      `json:"id"`
 	Title         string      `json:"title"`
 	Year          string      `json:"year"`
 	PaperType     PaperType   `json:"paperType"`
