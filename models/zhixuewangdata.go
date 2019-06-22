@@ -20,13 +20,14 @@ type Pager struct {
 }
 
 type Question struct {
-	Score       float64        `json:"score"`
-	Number      string         `json:"number"`
-	Section     Section        `json:"section"`
-	Difficulty  Difficulty     `json:"difficulty"`
-	Knowledges  []Knowledgeaaa `json:"knowledges"`
-	SubQuestion []SubQuestion  `json:"subQuestions"`
-	Materials   []Material     `json:"materials"`
+	Score          float64        `json:"score"`
+	Number         string         `json:"number"`
+	Section        Section        `json:"section"`
+	Difficulty     Difficulty     `json:"difficulty"`
+	Knowledges     []Knowledgeaaa `json:"knowledges"`
+	SubQuestion    []SubQuestion  `json:"subQuestions"`
+	Materials      []Material     `json:"materials"`
+	OriginalStruct OriginalStruct `json:"originalStruct"`
 }
 
 type Material struct {
@@ -40,6 +41,12 @@ type Section struct {
 	CategoryCode string  `json:"categoryCode"`
 	CategoryName string  `json:"categoryName"`
 	Score        float64 `json:"score"`
+}
+
+type OriginalStruct struct {
+	ContentHTML  string `json:"contentHtml"`
+	AnswerHTML   string `json:"answerHtml"`
+	AnalysisHTML string `json:"analysisHtml"`
 }
 
 type Difficulty struct {
@@ -66,6 +73,7 @@ type Answer struct {
 }
 
 type Paper struct {
+	ID            string      `json:"id"`
 	Title         string      `json:"title"`
 	Year          string      `json:"year"`
 	PaperType     PaperType   `json:"paperType"`

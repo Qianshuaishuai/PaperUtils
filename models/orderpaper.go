@@ -1,171 +1,292 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"strconv"
+	"time"
 
-type OPaperSimple struct {
-	ID               int       `gorm:"column:id"`
-	Name             string    `gorm:"column:name"`
-	PpaerType        string    `gorm:"column:paper_type"`
-	Province         int       `gorm:"column:province"`
-	Grade            int       `gorm:"column:grade"`
-	CreationDate     time.Time `gorm:"column:creation_date"`
-	ModificationDate time.Time `gorm:"column:modification_date"`
-}
+	"github.com/astaxie/beego"
+)
 
-type OMaterial struct {
-	ID               int       `gorm:"column:id"`
-	Name             string    `gorm:"column:name"`
-	Parent           int       `gorm:"column:parent"`
-	CreationDate     time.Time `gorm:"column:creation_date"`
-	ModificationDate time.Time `gorm:"column:modification_date"`
-}
+type Charset string
 
-type OKeypoint struct {
-	ID               int       `gorm:"column:id"`
-	Name             string    `gorm:"column:name"`
-	Parent           int       `gorm:"column:parent"`
-	CreationDate     time.Time `gorm:"column:creation_date"`
-	ModificationDate time.Time `gorm:"column:modification_date"`
-}
+const (
+	UTF8    = Charset("UTF-8")
+	GB18030 = Charset("GB18030")
+)
 
-func TranslatePaperType(str string) int {
-	switch str {
-	case "历年真题":
-		return 1
-	case "模拟题":
-		return 2
-	case "入学测验":
-		return 3
-	case "期末考试":
-		return 4
-	case "期中考试":
-		return 5
-	case "月考试卷":
-		return 6
-	case "其他类型":
-		return 7
-	case "单元测试":
-		return 8
-	default:
-		return 0
+const (
+	ORDER_BASE_URL = "/home/dashuai/orderPaper/试题数据/智学网高中化学/化学/高二/"
+)
+
+func writeOrderSql() {
+	abc()
+	// rd, _ := ioutil.ReadDir("./河南试卷/英语/八年级/")
+
+	// for r := range rd {
+	// 	writePaperSql(rd[r].Name())
+	// }
+	// writePaperSql("2017-2018学年河南省周口市八年级（上）期末英语试卷.txt")
+
+	// for g := range Grades {
+	// 	sem = Sems[g]
+	// 	grade = Grades[g]
+	// 	rd, _ := ioutil.ReadDir("./内蒙古/英语/" + Grades[g])
+	// 	for r := range rd {
+	// 		writePaperSql(rd[r].Name())
+	// 	}
+	// }
+
+	rd, _ := ioutil.ReadDir(ORDER_BASE_URL)
+
+	//已录到50
+	for i := 0; i < 1; i++ {
+		beego.Debug("记录点：" + strconv.Itoa(i))
+		writeOrderPaperSql(rd[i].Name())
 	}
+
+	// writeOrderPaperSql(rd[1222].Name())
+
+	// for i := 0; i < 1902; i++ {
+	// 	paperName := rd[i].Name()
+	// 	paperNameData := []rune(paperName)
+	// 	paperNameLength := len(paperNameData)
+
+	// 	var count int
+	// 	GetDb().Table("papers").Where("name = ?", string(paperNameData[0:paperNameLength-4])).Count(&count)
+
+	// 	if count <= 0 {
+	// 		beego.Debug("缺失试卷:" + paperName)
+	// 		beego.Debug("缺失试卷:" + strconv.Itoa(i))
+	// 	}
+	// }
+
 }
 
-func TranslateProvince(str string) int {
-	switch str {
-	case "全国":
-		return 1
-	case "北京":
-		return 2
-	case "天津":
-		return 3
-	case "河北":
-		return 4
-	case "山西":
-		return 5
-	case "辽宁":
-		return 6
-	case "吉林":
-		return 7
-	case "上海":
-		return 8
-	case "江苏":
-		return 9
-	case "浙江":
-		return 10
-	case "安徽":
-		return 11
-	case "福建":
-		return 12
-	case "江西":
-		return 13
-	case "山东":
-		return 14
-	case "河南":
-		return 15
-	case "湖北":
-		return 16
-	case "湖南":
-		return 17
-	case "广东":
-		return 18
-	case "广西":
-		return 19
-	case "海南":
-		return 20
-	case "重庆":
-		return 21
-	case "四川":
-		return 22
-	case "贵州":
-		return 23
-	case "云南":
-		return 24
-	case "西藏":
-		return 25
-	case "陕西":
-		return 26
-	case "甘肃":
-		return 27
-	case "青海":
-		return 28
-	case "宁夏":
-		return 29
-	case "新疆":
-		return 30
-	case "黑龙江":
-		return 31
-	case "内蒙古":
-		return 32
-	default:
-		return 0
+func writeOrderPaperSql(name string) {
+	tx := GetDb().Begin()
+
+	//新数据库表相关声明
+	var paperSimple OrderPaper
+
+	beego.Debug(ORDER_BASE_URL + name)
+	paperBytes, _ := ioutil.ReadFile(ORDER_BASE_URL + name)
+
+	var test PaperJsonSimple
+	err := json.Unmarshal(paperBytes, &test)
+	// if err != nil {
+	// 	beego.Debug(err)
+	// 	tx.Rollback()
+	// 	return
+	// }
+
+	paperSimple.ID = int(flakCurl.GetIntId())
+	paperSimple.OldID = test.Paper.ID
+	paperSimple.CreationDate = time.Now()
+	paperSimple.ModificationDate = time.Now()
+	paperSimple.GradeID = translateGrade(test.Paper.Grade[0].Name)
+	paperSimple.PaperType = translatePaperType(test.Paper.PaperType.Name)
+	paperSimple.RealDate = getDateTimeFormatForInt(test.Paper.DateTime / 1000)
+	paperSimple.Name = test.Paper.Title
+	paperSimple.Score = test.AnalyseData.TotalScore
+	paperSimple.SubjectID = 18 //(高中化学)
+
+	//创建试卷表对象
+	err = tx.Table("papers").Create(&paperSimple).Error
+	if err != nil {
+		beego.Debug(err)
+		tx.Rollback()
+		return
 	}
+
+	//创建试卷和省份关系
+	var paperProvince OrderPaperProvince
+	paperProvince.PaperID = paperSimple.ID
+	paperProvince.ProvinceID = translateProvinceID(test.Paper.DefaultArea.Name)
+	paperProvince.CreationDate = time.Now()
+	paperProvince.ModificationDate = time.Now()
+	err = tx.Table("paper_provinces").Create(&paperProvince).Error
+
+	if err != nil {
+		beego.Debug(err)
+		tx.Rollback()
+		return
+	}
+
+	//录入题目相关
+	questionList := test.Pager.List
+
+	for q := range questionList {
+
+		//事先检查是否存在同样的题目
+		var exercise OrderExercise
+		content := translateContent(questionList[q].Section.Name, questionList[q].SubQuestion[0].Stem)
+		GetDb().Table("exercise_info").Where("content = ?", content).Find(&exercise)
+
+		if exercise.ID > 0 {
+			//创建题和表的关系
+			var exercisePaper OrderPaperQuestion
+			exercisePaper.PaperID = paperSimple.ID
+			exercisePaper.ExerciseID = exercise.ID
+			exercisePaper.CreationDate = time.Now()
+			exercisePaper.ModificationDate = time.Now()
+
+			err = tx.Table("exercise_papers").Create(&exercisePaper).Error
+
+			if err != nil {
+				beego.Debug(err)
+				tx.Rollback()
+				return
+			}
+
+			continue
+		}
+
+		exerciseID := int(flakCurl.GetIntId())
+
+		//创建题和表的关系
+		var exercisePaper OrderPaperQuestion
+		exercisePaper.PaperID = paperSimple.ID
+		exercisePaper.ExerciseID = exerciseID
+		exercisePaper.CreationDate = time.Now()
+		exercisePaper.ModificationDate = time.Now()
+
+		err = tx.Table("exercise_papers").Create(&exercisePaper).Error
+
+		if err != nil {
+			beego.Debug(err)
+			tx.Rollback()
+			return
+		}
+
+		//创建题和知识点的关系
+		keypointData := questionList[q].Knowledges
+		for k := range keypointData {
+			var keypointQuestion OrderKeyPointQuestion
+			keypointQuestion.ExerciseID = exerciseID
+			keypointQuestion.KeypointID = translateKeypoint(keypointData[k].Name)
+			keypointQuestion.CreationDate = time.Now()
+			keypointQuestion.ModificationDate = time.Now()
+
+			err = tx.Table("exercise_keypoints").Create(&keypointQuestion).Error
+
+			if err != nil {
+				beego.Debug(err)
+				tx.Rollback()
+				return
+			}
+		}
+
+		if len(questionList[q].SubQuestion) > 1 {
+			beego.Debug("有大题")
+		} else {
+			var exercise OrderExercise
+			exercise.ID = exerciseID
+			exercise.Content = translateContent(questionList[q].Section.Name, questionList[q].SubQuestion[0].Stem)
+			exercise.CreationDate = time.Now()
+			exercise.ModificationDate = time.Now()
+			exercise.Difficulty = questionList[q].Difficulty.Value
+			exercise.ExerciseType = translateExerciseType(questionList[q].Section.Name)
+			exercise.SubjectID = 18 //(高中化学)
+			exercise.Score = questionList[q].Score
+
+			var analysisQuestion OrderAnalysisQuestion
+			analysisQuestion.ExerciseID = exerciseID
+			analysisQuestion.Analysis = questionList[q].OriginalStruct.AnalysisHTML
+			analysisQuestion.CreationDate = time.Now()
+			analysisQuestion.ModificationDate = time.Now()
+
+			err = tx.Table("exercise_analysis").Create(&analysisQuestion).Error
+
+			if err != nil {
+				beego.Debug(err)
+				tx.Rollback()
+				return
+			}
+
+			err = tx.Table("exercise_info").Create(&exercise).Error
+
+			if err != nil {
+				beego.Debug(err)
+				tx.Rollback()
+				return
+			}
+
+			if translateIsOption(questionList[q].Section.Name) == 1 {
+				optionDatas := questionList[q].SubQuestion[0].Options
+				for o := range optionDatas {
+					var question OrderQuestion
+					question.ID = int(flakCurl.GetIntId())
+					question.ExerciseID = exerciseID
+					question.CreationDate = time.Now()
+					question.ModificationDate = time.Now()
+					question.QuestionScore = questionList[q].Score
+					question.QuestionIndex = o
+					question.Question = optionDatas[o].Desc
+
+					err = tx.Table("exercise_question").Create(&question).Error
+
+					if err != nil {
+						beego.Debug(err)
+						tx.Rollback()
+						return
+					}
+
+					IsCorrect := judgeIsCorrectForOption(o, questionList[q].SubQuestion[0].Answers[0].Desc)
+
+					var answer OrderAnswer
+					answer.ID = int(flakCurl.GetIntId())
+					answer.ExerciseID = exerciseID
+					answer.QuestionID = question.ID
+					answer.CreationDate = time.Now()
+					answer.ModificationDate = time.Now()
+					if IsCorrect {
+						answer.IsCorrect = 1
+					} else {
+						answer.IsCorrect = 0
+					}
+
+					err = tx.Table("exercise_answer").Create(&answer).Error
+
+					if err != nil {
+						beego.Debug(err)
+						tx.Rollback()
+						return
+					}
+				}
+			} else {
+
+			}
+
+			if translateIsOption(questionList[q].Section.Name) == 1 {
+
+			} else {
+				answerData := questionList[q].SubQuestion[0].Answers
+				for a := range answerData {
+					var answer OrderAnswer
+					answer.ID = int(flakCurl.GetIntId())
+					answer.ExerciseID = exerciseID
+					answer.CreationDate = time.Now()
+					answer.ModificationDate = time.Now()
+					answer.Answer = answerData[a].Desc
+
+					err = tx.Table("exercise_answer").Create(&answer).Error
+
+					if err != nil {
+						beego.Debug(err)
+						tx.Rollback()
+						return
+					}
+				}
+			}
+		}
+
+	}
+
+	tx.Commit()
 }
 
-func TranslateGrade(str string) int {
-	switch str {
-	case "一年级":
-		return 1
-	case "二年级":
-		return 2
-	case "三年级":
-		return 3
-	case "四年级":
-		return 4
-	case "五年级":
-		return 5
-	case "六年级":
-		return 6
-	case "初一":
-		return 7
-	case "初二":
-		return 8
-	case "初三":
-		return 9
-	case "高一":
-		return 10
-	case "高二":
-		return 11
-	case "高三":
-		return 12
-	default:
-		return 0
-	}
-}
+func changeFileCode(name string) {
 
-func TranslateDiffculty(str string) int {
-	switch str {
-	case "容易":
-		return 1
-	case "较易":
-		return 2
-	case "一般":
-		return 3
-	case "较难":
-		return 4
-	case "困难":
-		return 5
-	default:
-		return 0
-	}
 }

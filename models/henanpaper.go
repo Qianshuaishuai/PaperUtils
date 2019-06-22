@@ -592,6 +592,11 @@ func getDateTimeForInt(dateTime int64) string {
 	return dataTimeStr
 }
 
+func getDateTimeFormatForInt(dateTime int64) time.Time {
+	dataTime := time.Unix(dateTime, 0)
+	return dataTime
+}
+
 func difficultyTranslate(difficulty int) int {
 	if difficulty == 3 {
 		return 5

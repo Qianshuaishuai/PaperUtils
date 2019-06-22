@@ -3,7 +3,6 @@ package models
 import (
 	"dreamEbagPapers/helper"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -24,7 +23,6 @@ type CurlReseponIntId struct {
 }
 
 func abc() {
-	fmt.Printf("111121233344")
 	curlIdClient = &http.Client{
 		Transport: &http.Transport{
 			//			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},

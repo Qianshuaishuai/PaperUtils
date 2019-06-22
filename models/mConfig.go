@@ -110,9 +110,7 @@ func init() {
 	// writeSql()
 	// GetZsPrimarySchoolPaper()
 	// writeKnowledge()
-
-	writeOMaterial()
-	// writeOKeypoint()
+	writeOrderSql()
 }
 
 //获取config
