@@ -50,6 +50,7 @@ type OrderPaperQuestion struct {
 type OrderExercise struct {
 	ID               int       `gorm:"column:id"`
 	Content          string    `gorm:"column:content"`
+	OldContent       string    `gorm:"column:old_content"`
 	SubjectID        int       `gorm:"column:subject_id"`
 	ExerciseType     int       `gorm:"column:exercise_type"`
 	Score            float64   `gorm:"column:score"`

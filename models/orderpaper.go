@@ -17,7 +17,7 @@ const (
 )
 
 const (
-	ORDER_BASE_URL = "/home/dashuai/orderPaper/试题数据/智学网高中化学/化学/高二/"
+	ORDER_BASE_URL = "/home/dashuai/orderPaper/试题数据/智学网高中化学/化学/高一/"
 )
 
 func writeOrderSql() {
@@ -40,8 +40,7 @@ func writeOrderSql() {
 
 	rd, _ := ioutil.ReadDir(ORDER_BASE_URL)
 
-	//已录到50
-	for i := 0; i < 1; i++ {
+	for i := 1876; i < 1900; i++ {
 		beego.Debug("记录点：" + strconv.Itoa(i))
 		writeOrderPaperSql(rd[i].Name())
 	}
@@ -121,8 +120,7 @@ func writeOrderPaperSql(name string) {
 
 		//事先检查是否存在同样的题目
 		var exercise OrderExercise
-		content := translateContent(questionList[q].Section.Name, questionList[q].SubQuestion[0].Stem)
-		GetDb().Table("exercise_info").Where("content = ?", content).Find(&exercise)
+		GetDb().Table("exercise_info").Where("old_content = ?", questionList[q].SubQuestion[0].Stem).Find(&exercise)
 
 		if exercise.ID > 0 {
 			//创建题和表的关系
@@ -183,6 +181,7 @@ func writeOrderPaperSql(name string) {
 		} else {
 			var exercise OrderExercise
 			exercise.ID = exerciseID
+			exercise.OldContent = questionList[q].SubQuestion[0].Stem
 			exercise.Content = translateContent(questionList[q].Section.Name, questionList[q].SubQuestion[0].Stem)
 			exercise.CreationDate = time.Now()
 			exercise.ModificationDate = time.Now()
@@ -198,14 +197,6 @@ func writeOrderPaperSql(name string) {
 			analysisQuestion.ModificationDate = time.Now()
 
 			err = tx.Table("exercise_analysis").Create(&analysisQuestion).Error
-
-			if err != nil {
-				beego.Debug(err)
-				tx.Rollback()
-				return
-			}
-
-			err = tx.Table("exercise_info").Create(&exercise).Error
 
 			if err != nil {
 				beego.Debug(err)
@@ -256,37 +247,105 @@ func writeOrderPaperSql(name string) {
 					}
 				}
 			} else {
+				isSmall := isContainSmall(questionList[q].SubQuestion[0].Stem)
 
-			}
+				if isSmall {
+					newContent, smallQuestionData := getSmallQuestionForNotOption(questionList[q].SubQuestion[0].Stem)
+					answerData := getSmallAnswerForNotOption(questionList[q].SubQuestion[0].Answers[0].Desc)
 
-			if translateIsOption(questionList[q].Section.Name) == 1 {
+					if len(smallQuestionData) != len(answerData) {
+						beego.Debug(smallQuestionData)
+						beego.Debug(answerData)
+						beego.Debug(len(smallQuestionData))
+						beego.Debug(len(answerData))
+						answerData := questionList[q].SubQuestion[0].Answers
+						for a := range answerData {
+							var answer OrderAnswer
+							answer.ID = int(flakCurl.GetIntId())
+							answer.ExerciseID = exerciseID
+							answer.CreationDate = time.Now()
+							answer.ModificationDate = time.Now()
+							answer.Answer = answerData[a].Desc
 
-			} else {
-				answerData := questionList[q].SubQuestion[0].Answers
-				for a := range answerData {
-					var answer OrderAnswer
-					answer.ID = int(flakCurl.GetIntId())
-					answer.ExerciseID = exerciseID
-					answer.CreationDate = time.Now()
-					answer.ModificationDate = time.Now()
-					answer.Answer = answerData[a].Desc
+							err = tx.Table("exercise_answer").Create(&answer).Error
 
-					err = tx.Table("exercise_answer").Create(&answer).Error
+							if err != nil {
+								beego.Debug(err)
+								tx.Rollback()
+								return
+							}
+						}
+					} else {
+						exercise.Content = newContent
+						for s := range smallQuestionData {
+							var question OrderQuestion
+							question.ID = int(flakCurl.GetIntId())
+							question.ExerciseID = exerciseID
+							question.CreationDate = time.Now()
+							question.ModificationDate = time.Now()
+							question.QuestionScore = questionList[q].Score / float64(len(smallQuestionData))
+							question.QuestionIndex = s
+							question.Question = smallQuestionData[s]
 
-					if err != nil {
-						beego.Debug(err)
-						tx.Rollback()
-						return
+							err = tx.Table("exercise_question").Create(&question).Error
+
+							if err != nil {
+								beego.Debug(err)
+								tx.Rollback()
+								return
+							}
+
+							var answer OrderAnswer
+							answer.ID = int(flakCurl.GetIntId())
+							answer.ExerciseID = exerciseID
+							answer.QuestionID = question.ID
+							answer.CreationDate = time.Now()
+							answer.ModificationDate = time.Now()
+							answer.IsCorrect = 0
+							answer.Answer = answerData[s]
+
+							err = tx.Table("exercise_answer").Create(&answer).Error
+
+							if err != nil {
+								beego.Debug(err)
+								tx.Rollback()
+								return
+							}
+						}
+
+					}
+
+				} else {
+					answerData := questionList[q].SubQuestion[0].Answers
+					for a := range answerData {
+						var answer OrderAnswer
+						answer.ID = int(flakCurl.GetIntId())
+						answer.ExerciseID = exerciseID
+						answer.CreationDate = time.Now()
+						answer.ModificationDate = time.Now()
+						answer.Answer = answerData[a].Desc
+
+						err = tx.Table("exercise_answer").Create(&answer).Error
+
+						if err != nil {
+							beego.Debug(err)
+							tx.Rollback()
+							return
+						}
 					}
 				}
+			}
+
+			err = tx.Table("exercise_info").Create(&exercise).Error
+
+			if err != nil {
+				beego.Debug(err)
+				tx.Rollback()
+				return
 			}
 		}
 
 	}
 
 	tx.Commit()
-}
-
-func changeFileCode(name string) {
-
 }
