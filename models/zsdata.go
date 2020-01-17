@@ -3,16 +3,16 @@ package models
 import (
 	"strconv"
 
+	"github.com/astaxie/beego"
 	"github.com/tidwall/gjson"
 )
 
 func GetZsPrimarySchoolPaper() {
-	papersUrl := "http://eschoolbag.readboy.com:8000/api/papers?from=2&year=2018&sn=ebagtest&page=1&count=100"
+	papersUrl := "http://eschoolbag.readboy.com:8000/api/papers?from=2&sn=ebagtest&page=1&count=100&subject=22"
 
 	_, data := queryApiForZs(papersUrl, "papers")
 
 	respData := data.Get("paper")
-
 	respData.ForEach(func(key, value gjson.Result) bool {
 		ID := value.Get("id").Int()
 		Name := value.Get("name").String()
@@ -43,6 +43,7 @@ func TranslatePaperData(data *gjson.Result) {
 	paperSimple.Date = getDateTimeForInt(data.Get("updateTime").Int())
 	paperSimple.Semester = translateZsPaperSem(data.Get("grade").Int())
 	paperSimple.ResourceType = 555
+	beego.Debug(paperSimple)
 }
 
 func translateZsCourseID(courseID int64) int {

@@ -19,7 +19,7 @@ func writeKnowledge() {
 	// 	getKnowledge(rd[r].Name())
 	// }
 
-	getKnowledge("初中英语知识点.txt")
+	getKnowledge("初中政治知识点.txt")
 	// writePaperSql("2017-2018学年河南省驻马店市确山县七年级（下）期末数学试卷.txt")
 
 }
@@ -34,7 +34,7 @@ func getKnowledge(name string) {
 		return
 	}
 
-	idCount := 1 + 2200000
+	idCount := 1 + 2800000
 
 	result := test.Result
 	for r := range result {

@@ -6,6 +6,7 @@ type OrderPaper struct {
 	ID               int       `gorm:"column:id"`
 	Name             string    `gorm:"column:name"`
 	Score            float64   `gorm:"column:score"`
+	Stage            int       `gorm:"column:stage_id"`
 	PaperType        int       `gorm:"column:paper_type_id"`
 	GradeID          int       `gorm:"column:grade_id"`
 	SubjectID        int       `gorm:"column:subject_id"`
@@ -49,6 +50,7 @@ type OrderPaperQuestion struct {
 
 type OrderExercise struct {
 	ID               int       `gorm:"column:id"`
+	Stage            int       `gorm:"column:stage_id"`
 	Content          string    `gorm:"column:content"`
 	OldContent       string    `gorm:"column:old_content"`
 	SubjectID        int       `gorm:"column:subject_id"`

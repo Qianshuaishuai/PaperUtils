@@ -17,7 +17,7 @@ const (
 )
 
 const (
-	ORDER_BASE_URL = "/home/dashuai/orderPaper/试题数据/智学网高中化学/化学/高一/"
+	ORDER_BASE_URL = "/home/dashuai/python/zxw-papers-utils-dev/zhixuewang高中/地理/高二/"
 )
 
 func writeOrderSql() {
@@ -40,7 +40,7 @@ func writeOrderSql() {
 
 	rd, _ := ioutil.ReadDir(ORDER_BASE_URL)
 
-	for i := 1876; i < 1900; i++ {
+	for i := 0; i < 1000; i++ {
 		beego.Debug("记录点：" + strconv.Itoa(i))
 		writeOrderPaperSql(rd[i].Name())
 	}
@@ -89,7 +89,8 @@ func writeOrderPaperSql(name string) {
 	paperSimple.RealDate = getDateTimeFormatForInt(test.Paper.DateTime / 1000)
 	paperSimple.Name = test.Paper.Title
 	paperSimple.Score = test.AnalyseData.TotalScore
-	paperSimple.SubjectID = 18 //(高中化学)
+	paperSimple.SubjectID = 8 //(高中化学)
+	paperSimple.Stage = 4
 
 	//创建试卷表对象
 	err = tx.Table("papers").Create(&paperSimple).Error
@@ -181,13 +182,14 @@ func writeOrderPaperSql(name string) {
 		} else {
 			var exercise OrderExercise
 			exercise.ID = exerciseID
+			exercise.Stage = 4
 			exercise.OldContent = questionList[q].SubQuestion[0].Stem
 			exercise.Content = translateContent(questionList[q].Section.Name, questionList[q].SubQuestion[0].Stem)
 			exercise.CreationDate = time.Now()
 			exercise.ModificationDate = time.Now()
 			exercise.Difficulty = questionList[q].Difficulty.Value
 			exercise.ExerciseType = translateExerciseType(questionList[q].Section.Name)
-			exercise.SubjectID = 18 //(高中化学)
+			exercise.SubjectID = 8 //(高中化学)
 			exercise.Score = questionList[q].Score
 
 			var analysisQuestion OrderAnalysisQuestion

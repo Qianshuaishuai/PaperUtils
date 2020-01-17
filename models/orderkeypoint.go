@@ -10,7 +10,7 @@ import (
 
 func writeOKeypoint() {
 	abc()
-	getOKeypoint("高中化学知识点utf8.txt")
+	getOKeypoint("初中数学知识点.txt")
 }
 
 func getOKeypoint(name string) {
@@ -34,6 +34,7 @@ func getOKeypoint(name string) {
 		os.Parent = 0
 		os.CreationDate = time.Now()
 		os.ModificationDate = time.Now()
+		os.SubjectID = 3
 		GetDb().Table("keypoints").Create(&os)
 
 		idCount = (int)(flakCurl.GetIntId())
@@ -51,6 +52,7 @@ func getOKeypoint(name string) {
 				os.Parent = parent1ID
 				os.CreationDate = time.Now()
 				os.ModificationDate = time.Now()
+				os.SubjectID = 3
 				GetDb().Table("keypoints").Create(&os)
 
 				idCount = (int)(flakCurl.GetIntId())
@@ -66,6 +68,7 @@ func getOKeypoint(name string) {
 						os.Parent = parent2ID
 						os.CreationDate = time.Now()
 						os.ModificationDate = time.Now()
+						os.SubjectID = 3
 						GetDb().Table("keypoints").Create(&os)
 
 						idCount = (int)(flakCurl.GetIntId())
@@ -81,6 +84,7 @@ func getOKeypoint(name string) {
 								os.Parent = parent3ID
 								os.CreationDate = time.Now()
 								os.ModificationDate = time.Now()
+								os.SubjectID = 3
 								GetDb().Table("keypoints").Create(&os)
 
 								idCount = (int)(flakCurl.GetIntId())
@@ -96,6 +100,7 @@ func getOKeypoint(name string) {
 										os.Parent = parent4ID
 										os.CreationDate = time.Now()
 										os.ModificationDate = time.Now()
+										os.SubjectID = 3
 										GetDb().Table("keypoints").Create(&os)
 
 										idCount = (int)(flakCurl.GetIntId())
@@ -111,6 +116,7 @@ func getOKeypoint(name string) {
 												os.Parent = parent5ID
 												os.CreationDate = time.Now()
 												os.ModificationDate = time.Now()
+												os.SubjectID = 3
 												GetDb().Table("keypoints").Create(&os)
 
 												idCount = (int)(flakCurl.GetIntId())

@@ -110,6 +110,13 @@ func init() {
 	// writeSql()
 	// GetZsPrimarySchoolPaper()
 	// writeKnowledge()
+	// writeOrderSql()
+	// addProvinceData()
+
+	// FixSolutionData()
+
+	// writeOKeypoint()
+
 	writeOrderSql()
 }
 

@@ -30,6 +30,15 @@ func translatePaperType(name string) int {
 }
 
 func translateGrade(name string) int {
+
+	if name == "七年级" {
+		return 7
+	} else if name == "八年级" {
+		return 8
+	} else if name == "九年级" {
+		return 9
+	}
+
 	var IDs []int
 	GetDb().Table("grades").Where("name = ?", name).Pluck("id", &IDs)
 

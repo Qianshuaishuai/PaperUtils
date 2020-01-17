@@ -25,7 +25,7 @@ func queryApiForZs(url, tag string) (bool, *gjson.Result) {
 	resp.Body.Close()
 
 	respJsonDatas := gjson.ParseBytes(robots)
-
+	beego.Debug(respJsonDatas)
 	if respJsonDatas.Get("ok").Int() != 1 {
 		var msg string
 		if respJsonDatas.Get("msg").Exists() {
